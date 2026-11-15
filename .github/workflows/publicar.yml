@@ -37,14 +37,14 @@ jobs:
       - name: Compilar os dois APKs release
         shell: bash
         run: |
-          mkdir -p byte-vortex-twoapk/android/app/src/kitkat/assets byte-vortex-twoapk/android/app/src/moderno/assets
-          cp byte-vortex-twoapk/kitkat/index.html byte-vortex-twoapk/android/app/src/kitkat/assets/index.html
+          mkdir -p byte-vortex-twoapk/android/app/src/marshmallow/assets byte-vortex-twoapk/android/app/src/moderno/assets
+          cp byte-vortex-twoapk/kitkat/index.html byte-vortex-twoapk/android/app/src/marshmallow/assets/index.html
           cp byte-vortex-twoapk/kitkat/index.html byte-vortex-twoapk/android/app/src/moderno/assets/index.html
           export BV_KEYSTORE="$RUNNER_TEMP/bytevortex-release.jks"
           export BV_PASSWORD="$(openssl rand -hex 24)"
           keytool -genkeypair -noprompt -keystore "$BV_KEYSTORE" -storetype JKS -storepass "$BV_PASSWORD" -keypass "$BV_PASSWORD" -alias bytevortex -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Byte Vortex'
           cd byte-vortex-twoapk/android
-          gradle assembleKitkatRelease assembleModernoRelease --stacktrace
+          gradle assembleMarshmallowRelease assembleModernoRelease --stacktrace
           rm -f "$BV_KEYSTORE"
       - name: Validar assinaturas e publicar arquivos
         env:
@@ -54,11 +54,11 @@ jobs:
           set -e
           TOOL=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
           mkdir -p entregas
-          cp byte-vortex-twoapk/android/app/build/outputs/apk/kitkat/release/*.apk entregas/Byte-Vortex-Android-4.4.apk
+          cp byte-vortex-twoapk/android/app/build/outputs/apk/marshmallow/release/*.apk entregas/Byte-Vortex-Android-6.apk
           cp byte-vortex-twoapk/android/app/build/outputs/apk/moderno/release/*.apk entregas/Byte-Vortex-Android-10.apk
-          "$TOOL" verify --verbose --min-sdk-version 19 entregas/Byte-Vortex-Android-4.4.apk
+          "$TOOL" verify --verbose --min-sdk-version 23 entregas/Byte-Vortex-Android-6.apk
           "$TOOL" verify --verbose --min-sdk-version 29 entregas/Byte-Vortex-Android-10.apk
-          gh release create "android-${GITHUB_RUN_NUMBER}" entregas/*.apk --title "Byte Vortex Android 4.4 e 10+" --notes 'APKs release assinados com chave temporaria. Versoes futuras exigem desinstalacao e podem apagar dados. Nao testados nos aparelhos. Catalogo online depende de itens publicados; pagamentos desativados.'
+          gh release create "android-${GITHUB_RUN_NUMBER}" entregas/*.apk --title "Byte Vortex Android 6.0 e 10+" --notes 'APKs release assinados com chave temporaria. Versoes futuras exigem desinstalacao e podem apagar dados. Nao testados nos aparelhos. Catalogo online depende de itens publicados; pagamentos desativados.'
       - uses: actions/upload-pages-artifact@v3
         with:
           path: byte-vortex-twoapk/srcproj/dist
