@@ -26,10 +26,12 @@ jobs:
         with:
           gradle-version: '8.9'
       - name: Extrair projeto
-        run: unzip -q byte-vortex-duas-versoes.zip
+        run: |
+          unzip -q byte-vortex-duas-versoes.zip
+          sed -i "s/targetSdk 28/targetSdk 35/" byte-vortex-twoapk/android/app/build.gradle
       - name: Compilar loja web
         working-directory: byte-vortex-twoapk/srcproj
-        run: npm install --legacy-peer-deps --no-audit --no-fund && npm run build
+        run: npm install --no-audit --no-fund && npm run build
       - name: Preparar catalogo publico
         run: cp byte-vortex-twoapk/catalogo.json byte-vortex-twoapk/srcproj/dist/catalogo.json
       - name: Compilar os dois APKs release
